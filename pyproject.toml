@@ -25,12 +25,18 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
+[project.scripts]
+trinity = "trinity_pattern.cli:main"
+
 [project.urls]
-Homepage = "https://github.com/aipass/trinity-pattern"
-Repository = "https://github.com/aipass/trinity-pattern"
+Homepage = "https://github.com/AIOSAI/AIPass"
+Repository = "https://github.com/AIOSAI/AIPass"
 
 [tool.setuptools.packages.find]
 include = ["trinity_pattern*"]
+
+[tool.setuptools.package-data]
+trinity_pattern = ["templates/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

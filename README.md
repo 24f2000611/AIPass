@@ -154,8 +154,29 @@ Add Trinity Pattern to your agent in 10 minutes.
 ### Install
 
 ```bash
+# From source (recommended — includes CLAUDE.md bootstrap)
+git clone https://github.com/AIOSAI/AIPass.git
+cd AIPass
+pip install -e .
+
+# From PyPI (coming soon)
 pip install trinity-pattern
 ```
+
+### Initialize
+
+```bash
+# From your project root directory
+trinity init --name "MyAgent" --role "Developer Assistant"
+```
+
+This creates:
+- `CLAUDE.md` — Bootstrap file that tells Claude Code about your agent's memory
+- `.trinity/id.json` — Agent identity
+- `.trinity/local.json` — Session history
+- `.trinity/observations.json` — Collaboration patterns
+
+**Important:** Run Claude Code from the same directory where you ran `trinity init`. The CLAUDE.md file must be in your working directory for Claude Code to auto-load it.
 
 ### Basic Usage
 
@@ -163,7 +184,7 @@ pip install trinity-pattern
 from trinity_pattern import Agent
 
 # Initialize agent with Trinity files
-agent = Agent(directory="./my_agent")
+agent = Agent(directory=".trinity")
 
 # Record a session
 agent.start_session()
@@ -197,6 +218,50 @@ if agent.needs_rollover():
 | CLI workflows | `trinity update` / `trinity context` commands | Low |
 
 The specification is JSON. The Python library is a convenience — you can implement Trinity in any language by reading and writing three JSON files that follow the schemas above.
+
+---
+
+## Your First Session
+
+The first session is the seeding session. Everything after it compounds on what you establish here.
+
+### 1. Initialize and launch
+
+```bash
+cd your-project
+trinity init --name "Scout" --role "Code Review Assistant"
+claude   # or open Claude Code in this directory
+```
+
+The agent will auto-read `CLAUDE.md` and discover its Trinity files.
+
+### 2. Introduce yourself
+
+Tell the agent who you are, what this project is about, and how you like to work. This becomes the foundation of its collaboration memory.
+
+```
+You: "I'm working on a Go microservice for payment processing.
+     I prefer concise code reviews — flag issues, skip praise.
+     We use conventional commits and squash merges."
+```
+
+### 3. Let it explore
+
+Point the agent at your codebase. Let it read your README, browse your code, understand the project. The more context it absorbs in the first session, the better every future session will be.
+
+### 4. Work naturally
+
+Have a real working session — review code, fix a bug, discuss architecture. The agent is learning your style the entire time.
+
+### 5. Save memories
+
+When you reach a natural stopping point:
+
+```
+You: "update memories"
+```
+
+The agent will write what it learned to its Trinity files — your preferences, what you worked on, patterns it noticed. Next session, it picks up exactly where you left off.
 
 ---
 
