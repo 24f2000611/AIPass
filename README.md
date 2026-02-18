@@ -1,6 +1,6 @@
 ![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
-![Status: Experimental](https://img.shields.io/badge/status-experimental-orange)
+![Status: Beta](https://img.shields.io/badge/status-beta-yellow)
 
 # Trinity Pattern
 
@@ -172,11 +172,12 @@ trinity init --name "MyAgent" --role "Developer Assistant"
 
 This creates:
 - `CLAUDE.md` — Bootstrap file that tells Claude Code about your agent's memory
+- `AGENTS.md` — Cross-platform bootstrap for other AI agents (Gemini CLI, Cursor, Codex, etc.)
 - `.trinity/id.json` — Agent identity
 - `.trinity/local.json` — Session history
 - `.trinity/observations.json` — Collaboration patterns
 
-**Important:** Run Claude Code from the same directory where you ran `trinity init`. The CLAUDE.md file must be in your working directory for Claude Code to auto-load it.
+**Important:** Run your AI agent from the same directory where you ran `trinity init`. The bootstrap files must be in your working directory for auto-loading.
 
 ### Basic Usage
 

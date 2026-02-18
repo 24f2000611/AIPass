@@ -100,6 +100,48 @@ class TestTrinityInit:
         assert data["identity"]["name"] == "First"
         assert "Skipped" in result.stdout
 
+    def test_agents_md_created(self, fresh_dir):
+        """trinity init creates AGENTS.md file."""
+        result = subprocess.run(
+            [sys.executable, "-m", "trinity_pattern.cli", "init", "--dir", str(fresh_dir)],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0
+        assert (fresh_dir / "AGENTS.md").exists()
+
+    def test_agents_md_content(self, fresh_dir):
+        """Generated AGENTS.md contains key Trinity Pattern content."""
+        subprocess.run(
+            [sys.executable, "-m", "trinity_pattern.cli", "init", "--dir", str(fresh_dir)],
+            capture_output=True,
+            text=True,
+        )
+
+        content = (fresh_dir / "AGENTS.md").read_text()
+        assert "trinity_pattern" in content
+        assert "Agent" in content
+        assert ".trinity" in content
+        assert "id.json" in content
+        assert "local.json" in content
+        assert "observations.json" in content
+
+    def test_agents_md_skip_existing(self, fresh_dir):
+        """trinity init does not overwrite existing AGENTS.md."""
+        # Create a custom AGENTS.md first
+        custom_content = "# Custom AGENTS.md — do not overwrite"
+        (fresh_dir / "AGENTS.md").write_text(custom_content)
+
+        result = subprocess.run(
+            [sys.executable, "-m", "trinity_pattern.cli", "init", "--dir", str(fresh_dir)],
+            capture_output=True,
+            text=True,
+        )
+
+        # Original content should be preserved
+        assert (fresh_dir / "AGENTS.md").read_text() == custom_content
+        assert "Skipped" in result.stdout
+
     def test_claude_md_references_trinity_dir(self, fresh_dir):
         """Generated CLAUDE.md references .trinity/ directory."""
         subprocess.run(

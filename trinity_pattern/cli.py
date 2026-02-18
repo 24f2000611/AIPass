@@ -18,11 +18,17 @@ def _get_template_path():
     return Path(__file__).parent / "templates" / "CLAUDE.md"
 
 
+def _get_agents_template_path():
+    """Get the path to the bundled AGENTS.md template."""
+    return Path(__file__).parent / "templates" / "AGENTS.md"
+
+
 def cmd_init(args):
     """Initialize Trinity Pattern in the current directory."""
     target_dir = Path(args.dir)
     trinity_dir = target_dir / ".trinity"
     claude_md = target_dir / "CLAUDE.md"
+    agents_md = target_dir / "AGENTS.md"
 
     created = []
     skipped = []
@@ -59,6 +65,17 @@ def cmd_init(args):
             # Fallback: template not found in package
             print(f"Warning: CLAUDE.md template not found at {template}", file=sys.stderr)
 
+    # Copy AGENTS.md template (don't overwrite existing)
+    if agents_md.exists():
+        skipped.append("AGENTS.md")
+    else:
+        agents_template = _get_agents_template_path()
+        if agents_template.exists():
+            shutil.copy2(agents_template, agents_md)
+            created.append("AGENTS.md")
+        else:
+            print(f"Warning: AGENTS.md template not found at {agents_template}", file=sys.stderr)
+
     # Report results
     if created:
         print(f"Initialized Trinity Pattern (v{TRINITY_VERSION})")
@@ -75,10 +92,11 @@ def cmd_init(args):
     if created:
         print()
         print("Next steps:")
-        print("  1. Open Claude Code from this directory")
-        print("  2. Say 'hi' — your agent will read CLAUDE.md and discover its memory files")
-        print("  3. Have a conversation — introduce yourself, share your project context")
-        print("  4. Say 'update memories' — the agent will save what it learned")
+        print("  1. Open your AI agent from this directory")
+        print("  2. CLAUDE.md bootstraps Claude Code; AGENTS.md bootstraps other agents")
+        print("  3. Say 'hi' — your agent will discover its memory files")
+        print("  4. Have a conversation — introduce yourself, share your project context")
+        print("  5. Say 'update memories' — the agent will save what it learned")
     elif not skipped:
         print("Nothing to do — Trinity Pattern is already initialized.")
 
