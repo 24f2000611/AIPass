@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/aipass/trinity-pattern/schemas/local.schema.json",
+  "title": "Trinity Pattern — Session History",
+  "description": "Rolling session history file. Tracks what the agent has done, current focus, and key learnings.",
+  "type": "object",
+  "required": ["trinity_version", "config", "active", "sessions"],
+  "properties": {
+    "trinity_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Trinity Pattern specification version"
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "max_lines": {
+          "type": "integer",
+          "default": 600,
+          "description": "Maximum lines before rollover triggers"
+        },
+        "max_sessions": {
+          "type": "integer",
+          "default": 50,
+          "description": "Maximum sessions to retain"
+        },
+        "rollover_strategy": {
+          "type": "string",
+          "enum": ["fifo"],
+          "default": "fifo",
+          "description": "Strategy for removing old sessions"
+        }
+      },
+      "additionalProperties": false
+    },
+    "active": {
+      "type": "object",
+      "properties": {
+        "current_focus": {
+          "type": "string",
+          "description": "What the agent is currently working on"
+        },
+        "recently_completed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "maxItems": 20,
+          "description": "Recently completed items (max 20)"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sessions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["session_number", "date", "activities", "status"],
+        "properties": {
+          "session_number": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Sequential session number"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO date of session"
+          },
+          "activities": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "What was done in this session"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["completed", "in_progress", "blocked"],
+            "description": "Session status"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "key_learnings": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Named learnings as key-value pairs (value includes ISO date)"
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "current_lines": {
+          "type": "integer",
+          "description": "Current line count of the file"
+        },
+        "rollover_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date-time" },
+              "sessions_extracted": { "type": "integer" },
+              "lines_before": { "type": "integer" },
+              "lines_after": { "type": "integer" }
+            }
+          },
+          "description": "History of rollover events"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/aipass/trinity-pattern/schemas/observations.schema.json",
+  "title": "Trinity Pattern — Collaboration Patterns",
+  "description": "Rolling observations file. Captures how the agent collaborates, not what it builds. Relationship and communication patterns.",
+  "type": "object",
+  "required": ["trinity_version", "config", "observations"],
+  "properties": {
+    "trinity_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Trinity Pattern specification version"
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "max_lines": {
+          "type": "integer",
+          "default": 600,
+          "description": "Maximum lines before rollover triggers"
+        },
+        "content_focus": {
+          "type": "string",
+          "default": "relationship and collaboration, not technical progress",
+          "description": "What observations should capture"
+        }
+      },
+      "additionalProperties": false
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["date", "session", "entries"],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO date of observation"
+          },
+          "session": {
+            "type": "integer",
+            "description": "Session number when observation was made"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["title", "observation"],
+              "properties": {
+                "title": {
+                  "type": "string",
+                  "description": "Short title for the observation"
+                },
+                "observation": {
+                  "type": "string",
+                  "description": "The insight or pattern noticed"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Categorization tags"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "current_lines": {
+          "type": "integer",
+          "description": "Current line count of the file"
+        },
+        "rollover_history": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date-time" },
+              "entries_extracted": { "type": "integer" },
+              "lines_before": { "type": "integer" },
+              "lines_after": { "type": "integer" }
+            }
+          },
+          "description": "History of rollover events"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

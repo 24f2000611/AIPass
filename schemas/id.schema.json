@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/aipass/trinity-pattern/schemas/id.schema.json",
+  "title": "Trinity Pattern — Agent Identity",
+  "description": "Permanent identity file for an AI agent. Defines who the agent is, what it does, and how it operates.",
+  "type": "object",
+  "required": ["trinity_version", "identity"],
+  "properties": {
+    "trinity_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Trinity Pattern specification version"
+    },
+    "identity": {
+      "type": "object",
+      "required": ["name", "role"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Agent name (unique identifier)"
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Agent role description"
+        },
+        "traits": {
+          "type": "string",
+          "description": "Comma-separated personality traits"
+        },
+        "purpose": {
+          "type": "string",
+          "description": "What this agent exists to do"
+        },
+        "what_i_do": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Core responsibilities"
+        },
+        "what_i_dont_do": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicit boundaries"
+        },
+        "principles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Operating principles"
+        }
+      },
+      "additionalProperties": false
+    },
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO date when identity was created"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO date of last update"
+        },
+        "platform": {
+          "type": "string",
+          "enum": ["claude-code", "chatgpt", "generic"],
+          "description": "Target AI platform"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
