@@ -7,7 +7,7 @@ name = "trinity-pattern"
 version = "1.0.0"
 description = "Persistent identity for AI agents — three files, one library, memory that outlives the session."
 readme = "README.md"
-license = "MIT"
+license = {text = "MIT"}
 requires-python = ">=3.8"
 authors = [
     { name = "AIPass", email = "aipass.system@gmail.com" },
