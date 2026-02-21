@@ -2,6 +2,7 @@
 
 import json
 import subprocess
+from pathlib import Path
 import sys
 
 import pytest
@@ -234,3 +235,145 @@ class TestE2EBootstrap:
         context = agent2.get_context()
         assert "Ran E2E test" in context
         assert "testing" in context
+
+
+class TestCLIDirect:
+    """Direct-import tests for cli.py to enable coverage instrumentation.
+
+    The subprocess-based tests above cannot measure coverage of cli.py because
+    coverage only instruments the current process. These tests import and call
+    CLI functions directly so coverage can track execution.
+    """
+
+    def test_get_template_path_returns_path(self):
+        """_get_template_path() returns a Path object pointing to templates/CLAUDE.md."""
+        from trinity_pattern.cli import _get_template_path
+
+        result = _get_template_path()
+        assert isinstance(result, Path)
+        assert result.name == "CLAUDE.md"
+        assert "templates" in result.parts
+
+    def test_get_agents_template_path_returns_path(self):
+        """_get_agents_template_path() returns a Path pointing to templates/AGENTS.md."""
+        from trinity_pattern.cli import _get_agents_template_path
+
+        result = _get_agents_template_path()
+        assert isinstance(result, Path)
+        assert result.name == "AGENTS.md"
+        assert "templates" in result.parts
+
+    def test_cmd_init_creates_files(self, tmp_path):
+        """cmd_init() creates all Trinity files when called directly."""
+        import argparse
+
+        from trinity_pattern.cli import cmd_init
+
+        args = argparse.Namespace(
+            dir=str(tmp_path),
+            name="DirectBot",
+            role="Tester",
+        )
+        cmd_init(args)
+
+        assert (tmp_path / ".trinity" / "id.json").exists()
+        assert (tmp_path / ".trinity" / "local.json").exists()
+        assert (tmp_path / ".trinity" / "observations.json").exists()
+        assert (tmp_path / "CLAUDE.md").exists()
+        assert (tmp_path / "AGENTS.md").exists()
+
+        with open(tmp_path / ".trinity" / "id.json", encoding="utf-8") as f:
+            data = json.load(f)
+        assert data["identity"]["name"] == "DirectBot"
+        assert data["identity"]["role"] == "Tester"
+
+    def test_cmd_init_skips_existing(self, tmp_path):
+        """cmd_init() skips files that already exist."""
+        import argparse
+
+        from trinity_pattern.cli import cmd_init
+
+        # First init
+        args = argparse.Namespace(dir=str(tmp_path), name="First", role="Original")
+        cmd_init(args)
+
+        # Second init — should skip all
+        args2 = argparse.Namespace(dir=str(tmp_path), name="Second", role="Override")
+        cmd_init(args2)
+
+        with open(tmp_path / ".trinity" / "id.json", encoding="utf-8") as f:
+            data = json.load(f)
+        assert data["identity"]["name"] == "First"
+
+    def test_main_no_command_exits_1(self):
+        """main() with no command prints help and exits with code 1."""
+        import unittest.mock
+
+        from trinity_pattern.cli import main
+
+        with unittest.mock.patch("sys.argv", ["trinity"]):
+            with pytest.raises(SystemExit) as exc_info:
+                main()
+            assert exc_info.value.code == 1
+
+    def test_main_init_command(self, tmp_path):
+        """main() with 'init' command runs successfully."""
+        import unittest.mock
+
+        from trinity_pattern.cli import main
+
+        with unittest.mock.patch(
+            "sys.argv",
+            ["trinity", "init", "--dir", str(tmp_path), "--name", "CLIBot", "--role", "Bot"],
+        ):
+            main()
+
+        assert (tmp_path / ".trinity" / "id.json").exists()
+
+    def test_cmd_init_missing_templates(self, tmp_path):
+        """cmd_init() handles missing templates gracefully."""
+        import argparse
+        import unittest.mock
+
+        from trinity_pattern.cli import cmd_init
+
+        args = argparse.Namespace(dir=str(tmp_path), name="NoTemplate", role="Tester")
+
+        # Mock template paths to non-existent locations
+        fake_path = Path("/tmp/nonexistent/CLAUDE.md")
+        fake_agents_path = Path("/tmp/nonexistent/AGENTS.md")
+
+        with unittest.mock.patch(
+            "trinity_pattern.cli._get_template_path", return_value=fake_path
+        ), unittest.mock.patch(
+            "trinity_pattern.cli._get_agents_template_path", return_value=fake_agents_path
+        ):
+            cmd_init(args)
+
+        # Trinity JSON files should still be created
+        assert (tmp_path / ".trinity" / "id.json").exists()
+        assert (tmp_path / ".trinity" / "local.json").exists()
+        assert (tmp_path / ".trinity" / "observations.json").exists()
+        # But CLAUDE.md and AGENTS.md should not exist (templates were missing)
+        assert not (tmp_path / "CLAUDE.md").exists()
+        assert not (tmp_path / "AGENTS.md").exists()
+
+    def test_cmd_init_nothing_to_do(self, tmp_path, capsys):
+        """cmd_init() prints 'Nothing to do' when all files exist but no new ones created."""
+        import argparse
+
+        from trinity_pattern.cli import cmd_init
+
+        # First init to create everything
+        args = argparse.Namespace(dir=str(tmp_path), name="Bot", role="Tester")
+        cmd_init(args)
+
+        # Clear output
+        capsys.readouterr()
+
+        # Second init — everything already exists
+        args2 = argparse.Namespace(dir=str(tmp_path), name="Bot2", role="Tester2")
+        cmd_init(args2)
+
+        captured = capsys.readouterr()
+        assert "Skipped" in captured.out
