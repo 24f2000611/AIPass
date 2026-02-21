@@ -5,18 +5,23 @@
 | Version | Supported |
 |---------|-----------|
 | 1.x.x  | Yes       |
-| < 1.0  | No        |
+| < 1.0   | No        |
 
 ## Reporting a Vulnerability
 
 **Do NOT open a public issue for security vulnerabilities.**
 
-Email: security@aipass.ai 
+Please use [GitHub's private vulnerability reporting](https://github.com/AIOSAI/AIPass/security/advisories/new) to report security issues. This ensures your report is handled confidentially.
 
-Include:
-- Description of the vulnerability
-- Steps to reproduce
-- Impact assessment
-- Suggested fix (if any)
+We will acknowledge within 48 hours and provide a resolution timeline within 7 days.
 
-We will acknowledge within 4 hours and provide a resolution timeline within 48 hours.
+## Scope
+
+- Trinity Pattern library code
+- Example implementations
+- Documentation that could lead to insecure usage
+
+## Out of Scope
+
+- Vulnerabilities in dependencies (report upstream)
+- Issues in third-party integrations
